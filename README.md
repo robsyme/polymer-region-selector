@@ -16,12 +16,12 @@ Somewhere in your html, put something like
 
 This will render something like:
 
-![Example region selector](img/selector.png)
+![Example region selector](http://i.imgur.com/Ej4KpWl.gif)
 
 
 Features
 --------
-The region-selector element draws the draggable bar and the scale at the top. The scale spacing is all calculated for you and should readjust on window resize.
+The region-selector element draws the draggable bar and the scale at the top. The scale spacing is all calculated for you and should readjust on window resize. The draggable handles and middle region also have appropriate cursors set in css.
 
 
 TODO
