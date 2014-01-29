@@ -16,7 +16,9 @@ Somewhere in your html, put something like
 
 This will render something like:
 
-![Example region selector](http://i.imgur.com/Ej4KpWl.gif)
+![Example region selector](http://i.imgur.com/dAweztO.gif)
+
+The coordinates are 'published' as attributes on your region-selector element and are available by calling .regionStart or .regionStop on the element.
 
 
 Features
