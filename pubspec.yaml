@@ -1,7 +1,7 @@
 name: polymer_region_selector
 author: Rob Syme <robsyme@gmail.com>
 version: 0.0.1
-homepage: http://robsyme.com
+homepage: http://github.com/robsyme/polymer-region-selector
 description: An GUI element for selecting a range of values on a genomic sequence.
 dependencies:
   polymer: '>=0.9.4'
