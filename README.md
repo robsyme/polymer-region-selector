@@ -12,7 +12,7 @@ Usage is pretty easy. In the header, include:
 
 Somewhere in your html, put something like
 
-          <region-selector id="my-selector" totalLength="1000"></region-selector>
+    <region-selector id="my-selector" totalLength="1000"></region-selector>
 
 This will render something like:
 
