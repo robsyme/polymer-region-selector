@@ -5,7 +5,7 @@ import 'package:polymer/polymer.dart';
 
 @CustomTag('region-selector')
 class RegionSelector extends PolymerElement {
-  @published int totalLength;
+  @published int totalLength = 1;
   @observable int regionStart;
   @observable int regionStop;
   @observable double pxStart;
@@ -32,7 +32,6 @@ class RegionSelector extends PolymerElement {
   void enteredView() {
     super.enteredView();
     setupWidths();
-    print("RegionSelector enteredView() - totalLength=$totalLength");
     window.onResize.listen(refreshWidths);
   }
   
@@ -91,6 +90,7 @@ class RegionSelector extends PolymerElement {
       attemptStopPositionMove(pxStop + frac);
     }
     e.preventDefault();
+    new CustomEvent('mousemove');
   }
   
   void mousemove(MouseEvent e) {
@@ -165,6 +165,38 @@ class RegionSelector extends PolymerElement {
     //regionStop = translatePixelToCoords(pxStop);
   }
   
+  double _log10(num x) {
+    return log(x) / log(10);
+  }
+  
+  num _nicenum(num x, bool round) {
+    int nf;
+    int exponent = _log10(x).floor();
+    double f = x / pow(10.0, exponent);
+    if(round) {
+      if(f < 1.5) {
+        nf = 1;
+      } else if(f < 3) {
+        nf = 2;
+      } else if(f < 7) {
+        nf = 5;
+      } else {
+        nf = 10;
+      }
+    } else {
+      if(f <= 1) {
+        nf = 1;
+      } else if(f <= 2) {
+        nf = 2;
+      } else if(f <= 5) {
+        nf = 5;
+      } else {
+        nf = 10;
+      }
+    }
+    return nf * pow(10, exponent);
+  }
+  
   void redrawScale() {
     GElement scaleGroup = $['scaleGroup'];
     scaleGroup.children.clear();
@@ -178,29 +210,37 @@ class RegionSelector extends PolymerElement {
     baseline.style.setProperty('stroke-width', '1');
     scaleGroup.children.add(baseline);
     
-    String majorTickString = (totalLength / (pixelWidth / 100)).toStringAsExponential(0);
-    String significance = majorTickString.split("+").last;
-    int majorTickWidthBp = num.parse(majorTickString).toInt();
+    int pixelSpacing = 100;
+    double pixelsPerBp = pixelWidth / totalLength;
+    double oneHundredPixelsInBp = pixelSpacing / pixelsPerBp;
+    int majorTickWidthBp = _nicenum(oneHundredPixelsInBp, true);
     double majorTickWidthPx = pixelWidth / totalLength * majorTickWidthBp;
     
+    int significance = _log10(majorTickWidthBp).floor();
     String suffix = "bp";
     switch(significance) {
-      case "0":
-      case "1":
-      case "2":
+      case 0:
+      case 1:
+      case 2:
         break;
-      case "3":
-      case "4":
-      case "5":
+      case 3:
+      case 4:
+      case 5:
         majorTickWidthBp = majorTickWidthBp ~/ 1000;
         suffix = "kbp";
         break;
-      default:
+      case 6:
+      case 7:
+      case 8:
         majorTickWidthBp = majorTickWidthBp ~/ 1000000;
         suffix = "Mbp";
+        break;
+      default:
+        majorTickWidthBp = majorTickWidthBp ~/ 1000000000;
+        suffix = "Gbp";
     }
     
-    int minorTickCount = 2;
+    int minorTickCount = 5;
     for (int i = 1; (i * majorTickWidthPx / minorTickCount) <= pixelWidth; i++) {
       String xString = (i * majorTickWidthPx / minorTickCount).toString();
       LineElement tickLine = new LineElement();
@@ -209,7 +249,7 @@ class RegionSelector extends PolymerElement {
       tickLine.attributes['y1'] = '0';
       if (i % minorTickCount == 0) {
         TextElement tickLabel = new TextElement();
-        tickLabel.text = "${i * majorTickWidthBp ~/ minorTickCount} ${suffix}";
+        tickLabel.text = "${i * majorTickWidthBp ~/ minorTickCount} $suffix";
         tickLabel.attributes['text-anchor'] = "middle";
         tickLabel.attributes['x'] = (i * majorTickWidthPx / minorTickCount).toString();
         tickLabel.attributes['y'] = "-12";

@@ -5,7 +5,6 @@ PolymerElement selector;
 
 void main() {
   initPolymer();
-  print("Hi there, from run.dart");
   
   selector = querySelector('region-selector');
   selector.onMouseMove.listen(updateCoordinates);
