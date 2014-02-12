@@ -75,7 +75,12 @@ class RegionSelector extends PolymerElement {
   void refreshWidths(Event e) {
     pixelWidth = $['minimap'].clientWidth - 2 * _BUFFER;
     pxStart = translateCoordsToPixels(regionStart);
-    pxStop = translateCoordsToPixels(regionStop);
+    if(regionStop >= totalLength) {
+      pxStop = pixelWidth;
+      regionStop = totalLength;
+    } else {
+      pxStop = translateCoordsToPixels(regionStop);
+    }
     $['minimapSelector'].attributes['transform'] = "translate($_BUFFER, 40)";
     redrawScale();
   }
@@ -161,12 +166,17 @@ class RegionSelector extends PolymerElement {
   
   void endSelection(MouseEvent e) {
     _dragmode = _DRAGMODE_NODRAG;
-    //regionStart = translatePixelToCoords(pxStart);
-    //regionStop = translatePixelToCoords(pxStop);
   }
   
   double _log10(num x) {
     return log(x) / log(10);
+  }
+  
+  void attributeChanged(String name, String oldValue, String newValue) {
+    switch(name) {
+      case 'totallength':
+        refreshWidths(new CustomEvent('dummy'));
+    }
   }
   
   num _nicenum(num x, bool round) {
